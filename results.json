@@ -1,0 +1,20 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B",
+  "training": {
+    "dataset": "openai/gsm8k",
+    "algorithm": "GRPO from scratch",
+    "num_updates": 300,
+    "group_size": 16,
+    "lora_rank": 128,
+    "lr": 3e-05,
+    "beta": 0.0005
+  },
+  "eval": {
+    "gsm8k_raw": 0.30401819944381714,
+    "gsm8k_rlvr": 0.7240333557128906,
+    "gsm8k_raw_soft": 0.5736433863639832,
+    "gsm_hard_raw": 0.1341925710439682,
+    "gsm_hard_rlvr": 0.36391204595565796,
+    "gsm_hard_raw_soft": 0.27748292684555054
+  }
+}
