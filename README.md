@@ -6,6 +6,11 @@ This repository explores a simple but interesting edge case: when each sampled t
 
 In other words: this repo is both a compact GRPO implementation and a small empirical demonstration that **near-zero logged policy loss does not imply zero learning signal**.
 
+<p align="center">
+  <img src="train_policy_loss_curve.png" alt="train loss" width="65%"/>
+  <img src="eval_gsm_small_accuracy.png" alt="eval accuracy" width="65%"/>
+</p>
+
 ## Main idea
 
 In PPO/GRPO-style methods, one usually keeps an `π_old` policy to compute importance ratios when the same rollout is reused across multiple optimization steps.
@@ -35,6 +40,10 @@ There is a second memory-saving trick as well: in the LoRA setting, the referenc
 No supervised reasoning traces are used.
 
 ## Results
+
+<p align="center">
+  <img src="results.png" alt="Metrics" width="65%"/>
+</p>
 
 Pure RL training substantially improves math performance on GSM8K and also transfers part of the gain to GSM-Hard.
 
@@ -69,4 +78,4 @@ x["prompt"] = (
 
 ## Checkpoints and logs
 
-Training artifacts, checkpoints, and TensorBoard logs are available on [Hugging Face](https://huggingface.co/zinchse/Qwen2.5-1.5Bgrpo_gsm8k/tree/main).
+Training artifacts, checkpoints, and TensorBoard logs are available on [Hugging Face](https://huggingface.co/zinchse/Qwen2.5-1.5Bgrpo_gsm8k/tree/main). Note that the TensorBoard log directory also contains curves from earlier runs. The final run is the one that reached 1200 steps.
