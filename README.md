@@ -2,7 +2,7 @@
 
 A minimal pure PyTorch implementation of GRPO-style RL training on GSM8K with LoRA over Qwen2.5-1.5B.
 
-This repository explores a simple but interesting edge case: when each sampled trajectory is used for **only one policy update**, we do not need to keep a separate `π_old` model in memory. In this regime, the **scalar policy loss value** stays near zero, yet the **gradient remains informative**, and the model still learns.
+This repository explores a simple but interesting edge case: when each sampled trajectory is used for **only one policy update**, we do not need to keep a separate `π_old` model in memory. In this regime, the **scalar policy loss value** stays near zero, yet the **gradient remains informative**, and the model still learn:
 
 In other words: this repo is both a compact GRPO implementation and a small empirical demonstration that **near-zero logged policy loss does not imply zero learning signal**.
 
@@ -14,7 +14,6 @@ In other words: this repo is both a compact GRPO implementation and a small empi
 ## Main idea
 
 In PPO/GRPO-style methods, one usually keeps an `π_old` policy to compute importance ratios when the same rollout is reused across multiple optimization steps.
-
 Here, each sampled trajectory is used **exactly once**:
 
 - generate a group of completions,
@@ -22,9 +21,32 @@ Here, each sampled trajectory is used **exactly once**:
 - apply one update,
 - discard the rollout.
 
-Because of that, at update time we can set `π_old = π.detach()`. The importance ratio is then equal to 1 in value, so the scalar GRPO policy loss becomes zero. However, this does **not** mean the gradient is zero: differentiation still flows through the current policy log-probabilities, while the detached term only shifts the scalar objective. This saves memory and simplifies the implementation. 
+Because of that, at update time we can set `π_old = π.stograd()`. The importance ratio is then equal to 1 in value, so the scalar GRPO policy loss becomes equal to mean of **centered** advantages, i.e. zero (up to rounding errors):
 
-There is a second memory-saving trick as well: in the LoRA setting, the reference policy `π_ref` is just the base model with adapters disabled. So there is no need to store a separate reference model either.
+$$
+\mathcal{L}_{\mathrm{policy}}(\theta)=
+-\frac{1}{G}\sum_{i=1}^{G}
+\min \left(
+\frac{\pi_{\theta}(o_i \mid q)}{\pi_{\mathrm{old}}(o_i \mid q)} \hat{A}_i, \quad
+clip \left(
+\frac{\pi_{\theta}(o_i \mid q)}{\pi_{\mathrm{old}}(o_i \mid q)},
+1-\varepsilon,
+1+\varepsilon
+\right)\hat{A}_i
+\right).
+$$
+
+However, this does **not** mean the gradient is zero: differentiation still flows through the current policy log-probabilities, while the detached term only shifts the scalar objective: 
+
+$$
+\nabla_\theta
+\frac{\pi_{\theta}(o_i \mid q)}
+{{stopgrad}(\pi_{\theta}(o_i \mid q))} \hat{A}_i=
+\frac{1}{{stopgrad}(\pi_{\theta}(o_i \mid q))}
+\nabla_\theta \pi_{\theta}(o_i \mid q) \hat{A}_i.
+$$
+
+This saves memory and simplifies the implementation (actually it becomes another form of REINFORCE algorithm). There is a second memory-saving trick as well: in the LoRA setting, the reference policy `π_ref` is just the base model with adapters disabled. So there is no need to store a separate reference model either.
 
 ## What is implemented
 
