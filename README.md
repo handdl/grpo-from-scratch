@@ -7,8 +7,7 @@ This repository explores a simple but interesting edge case: when each sampled t
 In other words: this repo is both a compact GRPO implementation and a small empirical demonstration that **near-zero logged policy loss does not imply zero learning signal**.
 
 <p align="center">
-  <img src="train_policy_loss_curve.png" alt="train loss" width="65%"/>
-  <img src="eval_gsm_small_accuracy.png" alt="eval accuracy" width="65%"/>
+  <img src="training_annotated.png" alt="train loss and eval accuracy" width="65%"/>
 </p>
 
 ## Main idea
