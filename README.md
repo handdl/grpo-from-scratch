@@ -47,12 +47,6 @@ No supervised reasoning traces are used.
 
 Pure RL training substantially improves math performance on GSM8K and also transfers part of the gain to GSM-Hard.
 
-| Benchmark | Base model | After RL |
-|---|---:|---:|
-| GSM8K (strict) | ~30% | ~71% |
-| GSM8K (soft) | ~56% | ~71% |
-| GSM-Hard (strict) | ~13% | ~37% |
-| GSM-Hard (soft) | ~27% | ~37% |
 
 **Strict** means the model must follow the required output format exactly.  
 **Soft** means only the final numeric answer is checked, ignoring exact formatting.
